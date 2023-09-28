@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <header>
+        <img id="my_image" src="Samgram_banner.png">
+    </header>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProfileApp</title>
+    <style>
+        body {text-align: center;}
+        #ID_userinput {float: left; width: 50%;  background-color: darkslategray; color: floralwhite;}
+        #findQuery {float: left; width: 50%; background-color: floralwhite; color: darkslategray;}
+        input {width: 120px;}
+        .user-data {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .user-data1 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        #my_image {
+            width: 100%;
+            height: 20%;
+        }
+    </style>
+</head>
+<body>
+    <div id="ID_userinput">
+        <h1>Enter details</h1>
+
+        <h4>ID</h4> 
+        <input id="ID_username" type="text"> 
+
+        <h4>Name</h4> 
+        <input id="ID_accountname" type="text"> 
+
+        <h4>Age</h4> 
+        <input id="ID_userAge" type="number"> <br><br>
+
+        <button id="insert">INSERT</button>
+        <button id="update">UPDATE</button>
+        <button id="remove">REMOVE</button> <br><br>
+    </div>
+
+    <div id="findQuery">
+        <h1>Find by ID</h1>
+        <h4>ID</h4>
+        <input id="findID" type="text"> <br><br>
+        <button id="find">FIND</button>
+        <h3 id="findName" type="text"></h3>
+        <h3 id="findAge" type="number"></h3> <br><br>
+    </div>
+
+
+    <div id="userData1" class="user-data1">
+        <h2>User Created:</h2>
+        <p><strong>ID:</strong> <span id="userDataID1"></span></p>
+        <p><strong>Name:</strong> <span id="userDataName1"></span></p>
+        <p><strong>Age:</strong> <span id="userDataAge1"></span></p>
+    </div>
+
+    <div id="userData2" class="user-data">
+        <h2>User Created:</h2>
+        <p><strong>ID:</strong> <span id="userDataID2"></span></p>
+        <p><strong>Name:</strong> <span id="userDataName2"></span></p>
+        <p><strong>Age:</strong> <span id="userDataAge2"></span></p>
+    </div>
+    
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOosNQKUiAWZDPDzsJ4dN_lfZP8NOCBDo",
+            authDomain: "csc305-profileapp.firebaseapp.com",
+            databaseURL: "https://csc305-profileapp-default-rtdb.firebaseio.com",
+            projectId: "csc305-profileapp",
+            storageBucket: "csc305-profileapp.appspot.com",
+            messagingSenderId: "30936723531",
+            appId: "1:30936723531:web:3b1b173ec8afdea7199dce",
+            measurementId: "G-1G6KVJJ6WM"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+
+        import {getDatabase, ref, get, set, child, update, remove}
+        from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"
+
+
+        const analytics = getAnalytics(app);
+
+
+        const db = getDatabase();
+
+        var ID_username = document.querySelector("#ID_username");
+        var ID_accountname = document.querySelector("#ID_accountname");
+        var ID_userAge = document.querySelector("#ID_userAge");
+        var findID = document.querySelector("#findID");
+        var findName = document.querySelector("#findName");
+        var findAge = document.querySelector("#findAge");
+        
+
+        var insertBtn = document.querySelector("#insert");
+        var updateBtn = document.querySelector("#update");
+        var removeBtn = document.querySelector("#remove");
+        var findBtn = document.querySelector("#find");
+
+
+        // Call DisplayUserData when the page loads
+        window.onload = DisplayUserData;
+
+        function InsertData() {
+            set(ref(db, "People/" + ID_username.value), {
+                Name: ID_accountname.value,
+                ID: ID_username.value,
+                Age: ID_userAge.value
+            })
+            .then(() => {
+                
+                alert("Data added successfully");
+
+                
+                document.getElementById("userDataID").textContent = ID_username.value;
+                document.getElementById("userDataName").textContent = ID_accountname.value;
+                document.getElementById("userDataAge").textContent = ID_userAge.value;
+
+               
+                const userDataDiv = document.getElementById("userData");
+                userDataDiv.style.display = "block";
+                userDataDiv.style.position = "fixed";
+                userDataDiv.style.top = "50%";
+                userDataDiv.style.left = "50%";
+                userDataDiv.style.transform = "translate(-50%, -50%)";
+            })
+            .catch((error) => {
+                alert(error);
+            });
+        }
+
+        function DisplayUserData() {
+            //JS -> Hmtl Div
+            const userDataDiv1 = document.getElementById("userData1");
+            const userDataDiv2 = document.getElementById("userData2"); 
+
+            // Displaying User 1
+            const dbref1 = child(ref(db, "People"), "111");
+            get(dbref1)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const user1 = snapshot.val();
+
+                        document.getElementById("userDataID1").textContent = user1.ID;
+                        document.getElementById("userDataName1").textContent = user1.Name;
+                        document.getElementById("userDataAge1").textContent = user1.Age;
+
+                        userDataDiv1.style.display = "block";
+                    } else {
+                        userDataDiv1.style.display = "none";
+                    }
+                })
+                .catch((error) => {
+                    alert(error);
+                });
+
+            // Displaying User 2
+            const dbref2 = child(ref(db, "People"), "222");
+            get(dbref2)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const user2 = snapshot.val();
+
+                        document.getElementById("userDataID2").textContent = user2.ID;
+                        document.getElementById("userDataName2").textContent = user2.Name;
+                        document.getElementById("userDataAge2").textContent = user2.Age;
+
+                        userDataDiv2.style.display = "block";
+                    } else {
+                        userDataDiv2.style.display = "none";
+                    }
+                })
+                .catch((error) => {
+                    alert(error);
+                });
+        }
+
+        function FindData() {
+            const dbref = ref(db);
+
+            get(child(dbref, "People/" + findID.value))
+            .then((snapshot)=>{
+                if(snapshot.exists()){
+                    findName.innerHTML = "Name: " + snapshot.val().Name;
+                    findAge.innerHTML = "Age: " + snapshot.val().Age;
+                } else {
+                    alert("No data found");
+                }
+            })
+            .catch((error)=>{
+                alert(error)
+            })
+            
+        }
+
+        function UpdateData(){
+            update(ref(db, "People/"+ ID_username.value),{
+                Name: ID_accountname.value,
+                Age: ID_userAge.value
+            })
+            .then(()=>{
+                alert("Data updated successfully");
+            })
+            .catch((error)=>{
+                alert(error);
+            });
+        }
+
+        function RemoveData(){
+            remove(ref(db, "People/"+ ID_username.value))
+            .then(()=>{
+                alert("Data deleted successfully");
+            })
+            .catch((error)=>{
+                alert(error);
+            });
+        }
+
+        insertBtn.addEventListener('click', InsertData);
+        updateBtn.addEventListener('click', UpdateData);
+        removeBtn.addEventListener('click', RemoveData);
+        findBtn.addEventListener('click', FindData);
+
+        
+    </script> 
+</body>
+</html>
